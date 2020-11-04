@@ -105,7 +105,8 @@ ui <- fluidPage(
                                  br(),
                                  br(),
                                  h4("Contact"),
-                                 p("App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com)")
+                                 p("App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com)."),
+                                 p("Code available on", a("GitHub", href = "https://github.com/cfmuniz/percebes-environmental-app"), ".")
                                  )),
             
             width = 12 - panel_width
