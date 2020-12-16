@@ -1,0 +1,60 @@
+---
+title: "app-about"
+author: "C. Muñiz"
+date: "09/12/2020"
+output: html_document
+---
+
+### About
+
+Remote sensing data of sea surface temperature (SST), air temperature, chlorophyll, and upwelling index data are available for 6 sites along the Galician coast (Spain).
+
+Data can be visualised as a time series, which allows to select daily values and/or smoothed values over an averaged time window. The number of days to calculate the smoothing window can be selected by the user.
+
+A date range can only be selected to visualise data as a time series or density plot.
+
+In addition, <i>in situ</i> measures of water and air temperature data are available for three of the sites.
+
+Data were processed within the framework of project [PERCEBES](https://www.unioviedo.es/percebes/)
+
+<p>&nbsp;</p>
+
+#### Data sources
+
+- Sea surface temperature (SST) data were obtained from the OSTIA model of the UK Met Office:
+[https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html](https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html)
+
+- Air temperature data (at 2m) were obtained from the ERA5-Land dataset from Copernicus:
+[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form)
+
+- Skin temperature (SKT, ground level) data were obtained from the ERA5-Land dataset from Copernicus:
+[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form)
+
+- Chlorophyll data were obtained from Ifremer's primary productivity model:
+[http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html](http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html)
+
+- A thermal upwelling index was calculated as the difference in SST between the coast and a point 350km offshore following Pfaff et al. (2011), using SST data from the OSTIA model. Thermal upwelling indices were calculated using the following formula:
+
+    UPW = (SST<sub>offhore</sub> - SST<sub>onshore</sub>) / (SST<sub>offshore</sub> - T<sub>bottom</sub>)
+
+    where, <i>SST<sub>offshore</sub></i> represents SST 350km offshore, <i>SST<sub>onshore</sub></i> represents SST close to the coast, and <i>T<sub>bottom</sub></i> is a constant temperature defined as 8ºC, representative of the bottom Eastern North Atlantic Central Water mass affecting the area of study (Ríos et al. 1992).
+
+- <i>In situ</i> data of air and water temperature were collected within the framework of project PERCEBES using iButtons (one or two depending on the site and period).
+
+SST, air temperature, chl-a, and upwelling index data were processed and provided by Nicolas Weidberg. <i>In situ</i> air and water temperature data were processed and provided by Alba Aguión.
+
+<p>&nbsp;</p>
+
+References
+
+<i>Pfaff, M. C., Branch, G. M., Wieters, E. A., Branch, R. A., & Broitman, B. R. (2011). Upwelling intensity and wave exposure determine recruitment of intertidal mussels and barnacles in the southern Benguela upwelling region. Marine Ecology Progress Series, 425, 141-152.</i>
+
+<i>Ríos, A. F., Pérez, F. F., & Fraga, F. (1992). Water masses in the upper and middle North Atlantic Ocean east of the Azores.</i>
+
+<p>&nbsp;</p>
+
+#### Contact
+
+App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com).
+
+Code available on [GitHub](https://github.com/cfmuniz/percebes-environmental-app")

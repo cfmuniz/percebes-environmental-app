@@ -1,124 +1,144 @@
 library(shiny)
+library(DT)
 library(tidyverse)
 library(readr)
 
 # Import data
-df <- read_csv("full_dataset.csv")
+df <- read_csv("full_dataset.csv")  # SST, air temperature, chlorophyll, upwelling
+ibutton_df <- read_csv("ibutton_dataset.csv")   # iButton in situ temperature
 
-panel_width = 3
+# Round to 3 decimals
+df$values <- round(df$values, 3)
+ibutton_df$mean <- round(ibutton_df$mean, 3)
+ibutton_df$sd <- round(ibutton_df$sd, 3)
 
-sites <- c("A Coruña", "Camelle", "Bueu", "Cangas", "Baiona", "A Guarda")
+panel_width <- 3
+
+# sites <- c("A Coruña", "Camelle", "Bueu", "Cangas", "Baiona", "A Guarda")
+sites <- c("L1", "L2", "L3", "L4", "L5", "L6")
 
 
-# Define UI
+# Define user interface
 
-ui <- fluidPage(
+ui <- navbarPage("PERCEBES app",
+                 
+                 tabPanel("Satellite data",
+                            sidebarLayout(
+                                sidebarPanel(
 
-    sidebarLayout(
-        sidebarPanel(
+                                    h3("Description"),
 
-            h3("Description"),
-
-            p("SST, air temperature, and chlorophyll data are shown for six
+                                    p("SST, air temperature, and chlorophyll data are shown for six
               sites along the Galician coast (displayed north to south). Data
               can be visualised as a time series, density plot, or boxplot."),
 
-            checkboxGroupInput(inputId = "site",
-                               label = "Select sites",
-                               choices = sites,
-                               selected = unique(df$site)
-            ),
+                                    checkboxGroupInput(inputId = "site",
+                                                       label = "Select sites",
+                                                       choices = sites,
+                                                       selected = unique(df$site)
+                                    ),
+                                    
+                                    radioButtons(inputId = "dataset",
+                                                 label = "Select data to plot",
+                                                 choices = c("Raw data only", "Smoothing only", "Data with smoothing")),
+                                    
+                                    
+                                    numericInput(inputId = "smoothingvalue",
+                                                 label = "Select smoothing window",
+                                                 value = 31,
+                                                 min = 1,
+                                                 max = 365,
+                                                 step = 1),
 
-            radioButtons(inputId = "dataset",
-                         label = "Select data to plot",
-                         choices = c("Raw data only", "Smoothing only", "Data with smoothing")),
+                                    helpText("Note: number of days used to calculate an average sliding window"),
 
-            numericInput(inputId = "smoothingvalue",
-                         label = "Select smoothing window",
-                         value = 31,
-                         min = 1,
-                         max = 365,
-                         step = 1),
+                                    dateRangeInput(inputId = "dates",
+                                                   label = "Select date range",
+                                                   start = min(df$date),
+                                                   end = max(df$date)),
 
-            helpText("Note: number of days used to calculate an average sliding window"),
-
-            dateRangeInput(inputId = "dates",
-                           label = "Select date range",
-                           start = min(df$date),
-                           end = max(df$date)),
-
-            width = panel_width
-
-
-            ),
-
-        mainPanel(
-            tabsetPanel(tabPanel("Time series",
-                                 plotOutput("sstPlot"),
-                                 plotOutput("airtempPlot"),
-                                 plotOutput("chlPlot"),
-                                 plotOutput("upwPlot")),
-
-                        tabPanel("Density plots",
-                                 plotOutput("sstDensity"),
-                                 plotOutput("airtempDensity"),
-                                 plotOutput("chlDensity"),
-                                 plotOutput("upwDensity")),
-
-                        tabPanel("Boxplots",
-
-                                 radioButtons(inputId = "variable",
-                                              label = "Select data to plot",
-                                              choices = c("SST", "Air temperature", "Chlorophyll", "Upwelling Index"),
-                                              inline = TRUE),
-
-                                 p(em("Note: Boxplots include the entire period by default. Data
-                                      for June 2017 is not presented for the entire month.")),
-
-                                 plotOutput("boxPlot",
-                                            width = "100%",
-                                            height = "800px")),
-
-                        tabPanel("About",
-                                 h3("About"),
-                                 p("Sea surface temperature (SST), air temperature, and chlorophyll
-                                   data are available for 6 sites along the Galician coast (Spain)."),
-                                 p("Data can be visualised as a time series, which allows to select
-                                   daily values and/or smoothed values over an averaged time window."),
-                                 p("The number of days to calculate the smoothing window can be selected
-                                   by the user."),
-                                 p("A date range can only be selected to visualise data as a time series
-                                   or density plot."),
-                                 p("Data were processed within the framework of project ",
-                                   a("PERCEBES", href="https://www.unioviedo.es/percebes/")),
-                                 br(),
-                                 br(),
-                                 h4("Data sources"),
-                                 p("- Sea surface temperature (SST) data were obtained from L4 OSTIA
-                                   model of the UK Met Office: ",
-                                   a("https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html",
-                                     href = "https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html")),
-                                 p("- Air temperature data were obtained from the ERA5-Land dataset
-                                   from Copernicus: ",
-                                   a("https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form",
-                                     href = "https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form")),
-                                 p("- Chlorophyll data were obtained from Ifremer: ",
-                                   a("http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html",
-                                     href = "http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html")),
-                                 br(),
-                                 br(),
-                                 h4("Contact"),
-                                 p("App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com)."),
-                                 p("Code available on", a("GitHub", href = "https://github.com/cfmuniz/percebes-environmental-app"), ".")
-                                 )),
-
-            width = 12 - panel_width
+                                    width = panel_width
 
 
-                        )
-        )
-)
+                                ),
 
+                                mainPanel(
+                                    tabsetPanel(tabPanel("Time series",
+                                                         plotOutput("sstPlot"),
+                                                         plotOutput("airtempPlot"),
+                                                         plotOutput("sktPlot"),
+                                                         plotOutput("chlPlot"),
+                                                         plotOutput("upwPlot")),
+
+                                                tabPanel("Density plots",
+                                                         plotOutput("sstDensity"),
+                                                         plotOutput("airtempDensity"),
+                                                         plotOutput("sktDensity"),
+                                                         plotOutput("chlDensity"),
+                                                         plotOutput("upwDensity")),
+
+                                                tabPanel("Boxplots",
+                                                         radioButtons(inputId = "variable",
+                                                                      label = "Select data to plot",
+                                                                      choices = c("SST", "Air temperature at 2m", "SKT",
+                                                                                  "Chlorophyll", "Upwelling Index"),
+                                                                      inline = TRUE),
+                                                         plotOutput("boxPlot",
+                                                                    width = "100%",
+                                                                    height = "800px"))),
+                                    
+                                    width = 12 - panel_width))),
+                 
+                 tabPanel("iButtons",
+
+                           sidebarLayout(
+                               sidebarPanel(
+
+                                   h3("Description"),
+
+                                   p("In situ temperature data measured with iButtons. Water/air 
+                                     temperatures are based on the sensor being underwater/out of
+                                     the water respectively."),
+                                   
+                                   checkboxGroupInput(inputId = "ibutton_site",
+                                                      label = "Select sites",
+                                                      choices = unique(ibutton_df$site),
+                                                      selected = unique(ibutton_df$site)
+                                   ),
+
+                                   checkboxGroupInput(inputId = "ibutton_temp",
+                                         label = "Temperature data: air and/or water",
+                                         choices = unique(ibutton_df$temp),
+                                         selected = unique(ibutton_df$temp)
+                                         ),
+                                   
+                                   radioButtons(inputId = "ibutton_dataset",
+                                                label = "Select data to plot",
+                                                choices = c("Raw data only", "Smoothing only", "Data with smoothing")),
+                                   
+                                   numericInput(inputId = "smoothingvalue",
+                                                label = "Select smoothing window",
+                                                value = 31,
+                                                min = 1,
+                                                max = 365,
+                                                step = 1),
+
+                                   dateRangeInput(inputId = "ibutton_dates",
+                                     label = "Select date range",
+                                     start = min(ibutton_df$date),
+                                     end = max(ibutton_df$date)),
+
+                                   width = panel_width
+                               ),
+
+                               mainPanel(
+                                   plotOutput("ibuttonPlot",
+                                              width = "100%",
+                                              height = "700px")))),
+
+                 
+                 tabPanel("About",
+                          includeMarkdown("app-about.Rmd")))
 
 
 
@@ -208,7 +228,7 @@ server <- function(input, output, session){
         airtemp_df <- rval_df() %>% plot_filter("airtemp")
 
         airtemp_plot <- base_plot +
-            ggtitle("Air temperature (ºC)") +
+            ggtitle("Air temperature at 2m") +
             ylab("Air temperature (ºC)") +
             ylim(3.5, 33.5)
 
@@ -218,6 +238,23 @@ server <- function(input, output, session){
 
 
 
+    # Plot SKT ----------------------------------------------------------------
+    
+    output$sktPlot <- renderPlot({
+        
+        skt_df <- rval_df() %>% plot_filter("skt")
+        
+        skt_plot <- base_plot +
+            ggtitle("Air temperature (ground level)") +
+            ylab("SKT (ºC)") +
+            ylim(2.5, 45)
+        
+        plot_select_data(skt_plot, skt_df)
+        
+    })
+    
+    
+    
     # Plot chlorophyll --------------------------------------------------------
 
     output$chlPlot <- renderPlot({
@@ -283,7 +320,7 @@ server <- function(input, output, session){
 
 
 
-    # Air temperature density plot --------------------------------------------------------
+    # Air temperature density plot --------------------------------------------
 
     output$airtempDensity <- renderPlot({
 
@@ -291,14 +328,29 @@ server <- function(input, output, session){
 
         base_density +
             geom_density(data = airtemp_df, density_mapping, size = 1, alpha = 0.2) +
-            ggtitle("Air temperature (ºC)") +
+            ggtitle("Air temperature at 2m") +
             xlab("Air temperature (ºC)")
 
     })
 
+    
+    
+    # SKT density plot --------------------------------------------------------
+    
+    output$sktDensity <- renderPlot({
+        
+        skt_df <- rval_df() %>% plot_filter("skt")
+        
+        base_density +
+            geom_density(data = skt_df, density_mapping, size = 1, alpha = 0.2) +
+            ggtitle("Air temperature (ground level)") +
+            xlab("SKT (ºC)")
+        
+    })
+    
 
 
-    # Chlorophyll density plot --------------------------------------------------------
+    # Chlorophyll density plot ------------------------------------------------
 
     output$chlDensity <- renderPlot({
 
@@ -312,7 +364,7 @@ server <- function(input, output, session){
     })
 
 
-    # Upwelling density plot ----------------------------------------------------------
+    # Upwelling density plot --------------------------------------------------
 
     output$upwDensity <- renderPlot({
 
@@ -358,12 +410,20 @@ server <- function(input, output, session){
                 ylab("SST (ºC)")
         }
 
-        if(input$variable == "Air temperature"){
+        if(input$variable == "Air temperature at 2m"){
             airtemp_box <-  rval_df() %>% boxplot_filter("airtemp")
 
             box_plot <- base_boxplot +
                 geom_boxplot(data = airtemp_box, aes(x = month, y = values, fill = year)) +
                 ylab("Air temperature (ºC)")
+        }
+        
+        if(input$variable == "SKT"){
+            skt_box <-  rval_df() %>% boxplot_filter("skt")
+            
+            box_plot <- base_boxplot +
+                geom_boxplot(data = skt_box, aes(x = month, y = values, fill = year)) +
+                ylab("SKT (ºC)")
         }
 
         if(input$variable == "Chlorophyll"){
@@ -384,6 +444,70 @@ server <- function(input, output, session){
 
         box_plot
     })
+
+    
+    
+    # iButton data ============================================================
+    
+    rval_ibutton <- reactive({
+        ibutton_df %>%
+            arrange(temp, site, date) %>%
+            group_by(temp, site) %>%
+            mutate(average = zoo::rollmean(mean, k = input$smoothingvalue,  fill = NA))
+    })
+    
+    
+    # Filter data by temperature measure, site, and date
+    
+    ibutton_filter <- function(df) {
+        df %>%
+            filter(temp %in% input$ibutton_temp,
+                   site %in% input$ibutton_site,
+                   date >= input$ibutton_dates[1],
+                   date <= input$ibutton_dates[2])
+    }
+
+
+    ibutton_base_plot <- ggplot() +
+        scale_x_datetime(date_breaks = "2 month",
+                         date_minor_breaks = "1 month",
+                         date_labels = "%b %Y") +
+        labs(colour = "Site",
+             linetype = "Temperature\nmeasure",
+             x = NULL) +
+        ggtitle("In situ temperature") +
+        ylab("Temperature (ºC)") +
+        ylim(9.4, 28.6) +
+        theme_bw()
+    
+
+    plot_select_ibutton <- function(plot, df) {
+        if(input$ibutton_dataset == "Raw data only" | input$ibutton_dataset == "Data with smoothing"){
+            plot <- plot +
+                geom_path(data = df,
+                          aes(x = date, y = mean, col = site, linetype = temp),
+                          size = 0.7,
+                          alpha = 0.6)
+        }
+        if(input$ibutton_dataset == "Smoothing only" | input$ibutton_dataset == "Data with smoothing"){
+            plot <- plot +
+                geom_path(data = df,
+                          aes(x = date, y = average, col = site, linetype = temp),
+                          size = 1,
+                          alpha = 0.6)
+        }
+        plot
+    }
+    
+    output$ibuttonPlot <- renderPlot({
+        
+        ibutton_data <- rval_ibutton() %>% ibutton_filter()
+
+
+        plot_select_ibutton(ibutton_base_plot, ibutton_data)
+        
+    })
+
 }
 
 
