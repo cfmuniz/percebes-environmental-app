@@ -2,10 +2,14 @@ library(shiny)
 library(DT)
 library(tidyverse)
 library(readr)
+library(leaflet)
 
 # Import data
 df <- read_csv("full_dataset.csv")  # SST, air temperature, chlorophyll, upwelling
 ibutton_df <- read_csv("ibutton_dataset.csv")   # iButton in situ temperature
+
+coords_df <- read_delim("map_coords.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
+
 
 # Round to 3 decimals
 df$values <- round(df$values, 3)
@@ -28,9 +32,9 @@ ui <- navbarPage("PERCEBES app",
 
                                     h3("Description"),
 
-                                    p("SST, air temperature, and chlorophyll data are shown for six
-              sites along the Galician coast (displayed north to south). Data
-              can be visualised as a time series, density plot, or boxplot."),
+                                    helpText("SST, air temperature, and chlorophyll data are shown for six
+                                    sites along the Galician coast (displayed north to south). Data
+                                    can be visualised as a time series, density plot, or boxplot."),
 
                                     checkboxGroupInput(inputId = "site",
                                                        label = "Select sites",
@@ -50,7 +54,8 @@ ui <- navbarPage("PERCEBES app",
                                                  max = 365,
                                                  step = 1),
 
-                                    helpText("Note: number of days used to calculate an average sliding window"),
+                                    helpText("Note: number of days used to calculate an average sliding window
+                                             (around the central value)."),
 
                                     dateRangeInput(inputId = "dates",
                                                    label = "Select date range",
@@ -89,14 +94,14 @@ ui <- navbarPage("PERCEBES app",
                                     
                                     width = 12 - panel_width))),
                  
-                 tabPanel("iButtons",
+                 tabPanel("In situ data",
 
                            sidebarLayout(
                                sidebarPanel(
 
                                    h3("Description"),
 
-                                   p("In situ temperature data measured with iButtons. Water/air 
+                                   helpText("In situ temperature data measured with iButtons. Water/air 
                                      temperatures are based on the sensor being underwater/out of
                                      the water respectively."),
                                    
@@ -122,6 +127,9 @@ ui <- navbarPage("PERCEBES app",
                                                 min = 1,
                                                 max = 365,
                                                 step = 1),
+                                   
+                                   helpText("Note: number of days used to calculate an average sliding window
+                                             (around the central value)."),
 
                                    dateRangeInput(inputId = "ibutton_dates",
                                      label = "Select date range",
@@ -135,7 +143,46 @@ ui <- navbarPage("PERCEBES app",
                                    plotOutput("ibuttonPlot",
                                               width = "100%",
                                               height = "700px")))),
-
+                 
+                 tabPanel("Tables",
+                          
+                          sidebarLayout(
+                              sidebarPanel(
+                                  
+                                  h3("Description"),
+                                  
+                                  helpText("Tabular data presented in the graphs."),
+                                  
+                                  helpText("For the satellite data, the column 'Values' shows the real values at each timestamp.
+                                    The column 'Average' represents the rolling average of multiple days as selected
+                                    for the smoothing window (around the central value)."),
+                                    
+                                  helpText("For the in situ data, the average value of one or two sensors is presented as a 'Mean'
+                                    value with a standard deviation ('SD'). The 'Average' is calculated the same way as
+                                    the satellite data."),
+                                  
+                                  radioButtons(inputId = "data",
+                                               label = "Select data to display",
+                                               choices = c("Satellite", "In situ")),
+                                  
+                                  numericInput(inputId = "table_smoothing",
+                                               label = "Select smoothing window",
+                                               value = 31,
+                                               min = 1,
+                                               max = 365,
+                                               step = 1),
+                                  
+                                  downloadButton(outputId = "downloadData",
+                                                 label = "Download"),
+                                  
+                                  helpText("Note: the complete dataset is downloaded for the option selected.
+                                           Smoothing window can be selected (values shown in column 'Average'."),
+                                  
+                                  width = panel_width),
+                              
+                              mainPanel(
+                                  dataTableOutput("dfTable")
+                              ))),
                  
                  tabPanel("About",
                           includeMarkdown("app-about.Rmd")))
@@ -503,11 +550,91 @@ server <- function(input, output, session){
         
         ibutton_data <- rval_ibutton() %>% ibutton_filter()
 
-
         plot_select_ibutton(ibutton_base_plot, ibutton_data)
         
     })
 
+
+    
+    # Table ===================================================================
+    
+    # Function to select dataset to output as table
+    
+    table_selector <- function(df, variable, values){
+        df %>%
+            arrange({{variable}}, site, date) %>%
+            group_by({{variable}}, site) %>%
+            mutate(average = zoo::rollmean({{values}}, k = input$table_smoothing,  fill = NA))
+    }
+
+    
+    output$dfTable <- renderDataTable({
+
+        if(input$data == "Satellite"){
+            
+            # Rename variables measured
+            
+            var_levels <- c("sst" = "SST", "airtemp" = "Air temperature (2m)",
+                            "chl" = "Chlorophyll", "upw" = "Upwelling", "skt" = "SKT")
+            df$variable <- as.character(var_levels[df$variable])
+            df$variable <- as.factor(df$variable)
+            
+
+            # Select data
+            
+            satellite_table <- eventReactive(input$table_smoothing, {
+                table_selector(df, variable, values) %>%
+                    rename(Date = date, Site = site, "Variable measured" = variable, Values = values, Average = average)
+            })
+            
+            table <- satellite_table()
+        }
+
+
+        if(input$data == "In situ"){
+            
+            # Rename variables measured
+            
+            ibutton_var_levels <- c("air" = "Air temperature", "water" = "Water temperature")
+            ibutton_df$temp <- as.character(ibutton_var_levels[ibutton_df$temp])
+            ibutton_df$temp <- as.factor(ibutton_df$temp)
+            ibutton_df$site <- as.factor(ibutton_df$site)
+            
+            # Re-order columns to match the satellite data
+            
+            ibutton_df <- ibutton_df[c("date", "site", "temp", "mean", "sd")]
+            
+
+            # Select data
+            
+            ibutton_table <- eventReactive(input$table_smoothing, {
+                table_selector(ibutton_df, temp, mean) %>%
+                            rename(Date = date, Site = site, "Variable measured" = temp, Mean = mean, SD = sd, Average = average)
+            })
+            
+            table <- ibutton_table()
+        }
+
+        
+        # Table downloadable as .csv
+        
+        output$downloadData <- downloadHandler(
+            filename = function() {
+                paste(input$data, ".csv", sep = "")
+            },
+            content = function(file) {
+                write.csv(table, file, row.names = FALSE)
+            }
+        )
+        
+
+        # Print table output to screen
+        
+        table
+    },
+    
+    filter = "top")
+    
 }
 
 
