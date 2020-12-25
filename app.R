@@ -8,7 +8,11 @@ library(leaflet)
 df <- read_csv("full_dataset.csv")  # SST, air temperature, chlorophyll, upwelling
 ibutton_df <- read_csv("ibutton_dataset.csv")   # iButton in situ temperature
 
-coords_df <- read_delim("map_coords.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
+# coords_df <- read_delim("map_coords.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
+# test <- read_table2("test.txt")
+
+coords_df <- read_csv("data_coords.csv")
+
 
 
 # Round to 3 decimals
@@ -34,7 +38,8 @@ ui <- navbarPage("PERCEBES app",
 
                                     helpText("SST, air temperature, and chlorophyll data are shown for six
                                     sites along the Galician coast (displayed north to south). Data
-                                    can be visualised as a time series, density plot, or boxplot."),
+                                    can be visualised as a time series, density plot, or boxplot.
+                                    The names and coordinates of the sites can be viewed in the 'Data locations' tab."),
 
                                     checkboxGroupInput(inputId = "site",
                                                        label = "Select sites",
@@ -101,9 +106,10 @@ ui <- navbarPage("PERCEBES app",
 
                                    h3("Description"),
 
-                                   helpText("In situ temperature data measured with iButtons. Water/air 
-                                     temperatures are based on the sensor being underwater/out of
-                                     the water respectively."),
+                                   helpText("In situ temperature data measured with iButtons. Water/air
+                                   temperatures are based on the sensor being underwater/out of
+                                   the water respectively. The names and coordinates of the sites
+                                   can be viewed in the 'Data locations' tab."),
                                    
                                    checkboxGroupInput(inputId = "ibutton_site",
                                                       label = "Select sites",
@@ -176,13 +182,34 @@ ui <- navbarPage("PERCEBES app",
                                                  label = "Download"),
                                   
                                   helpText("Note: the complete dataset is downloaded for the option selected.
-                                           Smoothing window can be selected (values shown in column 'Average'."),
+                                           Smoothing window can be selected (values shown in column 'Average')."),
                                   
                                   width = panel_width),
                               
                               mainPanel(
                                   dataTableOutput("dfTable")
                               ))),
+                 
+                 tabPanel("Data locations",
+                          
+                          div(class="outer",
+                              
+                              tags$head(
+                                  # Include our custom CSS
+                                  includeCSS("styles.css")
+                                  
+                              ),
+                          
+                          leafletOutput("map",
+                                        width = "100%",
+                                        height = "800px"),
+                          
+                          absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                        draggable = TRUE, top = 80, left = "auto", right = 20, bottom = "auto",
+                                        width = 400, height = "auto",
+                                        
+                                        includeMarkdown("map-description.Rmd"),
+                                        ))),
                  
                  tabPanel("About",
                           includeMarkdown("app-about.Rmd")))
@@ -635,6 +662,39 @@ server <- function(input, output, session){
     
     filter = "top")
     
+    
+    # Coordinates of sites and environmental data =============================
+    
+    coord_groups <- group_split(coords_df, variable)
+
+    base_map <- leaflet() %>%
+        addTiles() %>%
+        setView(-10, 44, zoom = 7)
+
+    map_selector <- function(map = base_map, df, color){
+        map %>%
+            addRectangles(
+                lng1 = df$lng1, lat1 = df$lat1, lng2 = df$lng2, lat2 = df$lat2,
+                group = df$site.code,
+                label = paste0(df$site.code, " (", df$site, "), ", df$variable),
+                labelOptions = labelOptions(textsize = "15px"),
+                fillColor = "transparent",
+                color = color
+            )
+    }
+    
+    
+    output$map <- leaflet::renderLeaflet({
+        
+        map_selector(df = coord_groups[[4]], color = "blue") %>%
+            map_selector(df = coord_groups[[1]], color = "red") %>%
+            map_selector(df = coord_groups[[2]], color = "black") %>%
+            addMarkers(
+                lng = coord_groups[[3]]$lng1, lat = coord_groups[[3]]$lat1,
+                label = paste0(coord_groups[[3]]$site.code, " (", coord_groups[[3]]$site, "), ", coord_groups[[3]]$variable),
+                labelOptions = labelOptions(textsize = "15px")
+                )
+    })
 }
 
 

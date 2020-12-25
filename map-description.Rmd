@@ -1,0 +1,15 @@
+---
+title: "Map description"
+author: "C. Muñiz"
+date: "24/12/2020"
+output: html_document
+---
+
+### Description
+
+Map of the areas used to measure each variable in the app.
+
+- <b>Blue polygons</b>: SST (for SST and upwelling index, see <i>About</i> for details)
+- <b>Red polygons</b>: AT (air temperature, both at ground level and at 2m height)
+- <b>Black polygons</b>: chlorophyll
+- <b>Bubble markers</b>: location where samples of percebes were collected

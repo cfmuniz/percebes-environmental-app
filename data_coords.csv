@@ -1,0 +1,31 @@
+site,site.code,variable,position,lat1,lng1,lat2,lng2
+A Guarda,L6,Percebes' samples,,41.898,-8.88,,
+Baiona,L5,Percebes' samples,,42.118460,-8.866790,,
+Cangas,L4,Percebes' samples,,42.251826,-8.873537,,
+Bueu,L3,Percebes' samples,,42.355,-8.946,,
+Camelle,L2,Percebes' samples,,43.19,-9.174,,
+A Coruña,L1,Percebes' samples,,43.389307,-8.413661,,
+A Guarda,L6,SST,coastal,41.925,-8.825,41.825,-8.925
+Baiona,L5,SST,coastal,42.075,-8.825,42.175,-8.925
+Cangas,L4,SST,coastal,42.175,-8.825,42.275,-8.925
+Bueu,L3,SST,coastal,42.325,-8.925,42.425,-9.025
+Camelle,L2,SST,coastal,43.175,-9.125,43.275,-9.225
+A Coruña,L1,SST,coastal,43.375,-8.375,43.475,-8.475
+A Guarda,L6,SST,offshore,41.425,-13.025,41.525,-13.125
+Baiona,L5,SST,offshore,41.825,-13.075,41.925,-13.175
+Cangas,L4,SST,offshore,41.975,-13.075,42.075,-13.175
+Bueu,L3,SST,offshore,42.075,-13.175,42.175,-13.275
+Camelle,L2,SST,offshore,45.575,-12.025,45.675,-12.125
+A Coruña,L1,SST,offshore,46.475,-8.625,46.575,-8.725
+A Guarda,L6,AT,,41.85,-8.85,41.95,-8.75
+Baiona,L5,AT,,42.0499,-8.85,42.1499,-8.75
+Cangas,L4,AT,,42.25,-8.85,42.35,-8.75
+Bueu,L3,AT,,42.35,-8.95,42.45,-8.85
+Camelle,L2,AT,,43.1499,-9.05,43.2499,-8.95
+A Coruña,L1,AT,,43.25,-8.45,43.35,-8.35
+A Guarda,L6,Chl,,41.893,-8.9075,41.903,-8.8925
+Baiona,L5,Chl,,42.135,-8.9075,42.145,-8.8925
+Cangas,L4,Chl,,42.246826,-8.881037,42.256826,-8.866037
+Bueu,L3,Chl,,42.35,-8.9535,42.36,-8.9385
+Camelle,L2,Chl,,43.195,-9.1815,43.205,-9.1665
+A Coruña,L1,Chl,,43.405,-8.421161,43.415,-8.406161
