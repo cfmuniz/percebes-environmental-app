@@ -5,15 +5,9 @@ library(readr)
 library(leaflet)
 
 # Import data
-df <- read_csv("full_dataset.csv")  # SST, air temperature, chlorophyll, upwelling
+df <- read_csv("full_dataset.csv")              # SST, air temperature, chlorophyll, upwelling
 ibutton_df <- read_csv("ibutton_dataset.csv")   # iButton in situ temperature
-
-# coords_df <- read_delim("map_coords.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
-# test <- read_table2("test.txt")
-
-coords_df <- read_csv("data_coords.csv")
-
-
+coords_df <- read_csv("data_coords.csv")        # coordinates where data were obtained
 
 # Round to 3 decimals
 df$values <- round(df$values, 3)
@@ -22,7 +16,6 @@ ibutton_df$sd <- round(ibutton_df$sd, 3)
 
 panel_width <- 3
 
-# sites <- c("A Coruña", "Camelle", "Bueu", "Cangas", "Baiona", "A Guarda")
 sites <- c("L1", "L2", "L3", "L4", "L5", "L6")
 
 
@@ -67,10 +60,7 @@ ui <- navbarPage("PERCEBES app",
                                                    start = min(df$date),
                                                    end = max(df$date)),
 
-                                    width = panel_width
-
-
-                                ),
+                                    width = panel_width),
 
                                 mainPanel(
                                     tabsetPanel(tabPanel("Time series",
@@ -142,8 +132,7 @@ ui <- navbarPage("PERCEBES app",
                                      start = min(ibutton_df$date),
                                      end = max(ibutton_df$date)),
 
-                                   width = panel_width
-                               ),
+                                   width = panel_width),
 
                                mainPanel(
                                    plotOutput("ibuttonPlot",
@@ -195,10 +184,9 @@ ui <- navbarPage("PERCEBES app",
                           div(class="outer",
                               
                               tags$head(
-                                  # Include our custom CSS
+                                  # Include custom CSS style
                                   includeCSS("styles.css")
-                                  
-                              ),
+                                  ),
                           
                           leafletOutput("map",
                                         width = "100%",
