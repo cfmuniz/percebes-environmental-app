@@ -273,7 +273,7 @@ server <- function(input, output, session){
         sst_plot <- base_plot +
             ggtitle("SST") +
             ylab("SST (ºC)") +
-            ylim(11.5, 20)
+            ylim(11.5, 20.4)
 
         plot_select_data(sst_plot, sst_df)
 
