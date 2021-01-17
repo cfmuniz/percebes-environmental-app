@@ -14,9 +14,17 @@ df$values <- round(df$values, 3)
 ibutton_df$mean <- round(ibutton_df$mean, 3)
 ibutton_df$sd <- round(ibutton_df$sd, 3)
 
+# Define sites
+sites <- c("L0 – Cariño", "L1 – A Coruña", "L2 – Camelle", "L3 – Bueu",
+           "L4 – Cangas", "L5 – Baiona", "L6 – A Guarda")
+df$site <- factor(df$site, levels = sites)
+
+ibutton_sites <- c("L1 – A Coruña", "L4 – Cangas", "L5 – Baiona")
+ibutton_df$site <- factor(ibutton_df$site, levels = ibutton_sites)
+
+# Define panel width for UI and main panel
 panel_width <- 3
 
-sites <- c("L1", "L2", "L3", "L4", "L5", "L6")
 
 
 # Define user interface
@@ -29,15 +37,16 @@ ui <- navbarPage("PERCEBES app",
 
                                     h3("Description"),
 
-                                    helpText("SST, air temperature, and chlorophyll data are shown for six
-                                    sites along the Galician coast (displayed north to south). Data
-                                    can be visualised as a time series, density plot, or boxplot.
-                                    The names and coordinates of the sites can be viewed in the 'Data locations' tab."),
+                                    helpText("SST, air temperature, chlorophyll, and upwelling index data are shown for six
+                                    sites along the Galician coast (L1 to L6). For site L0 only SST data is available.
+                                    Sites are displayed north to south, more information can be viewed in the", 
+                                    em("Data locations"), "tab.
+                                    Data can be visualised as a time series, density plot, or boxplot."),
 
                                     checkboxGroupInput(inputId = "site",
                                                        label = "Select sites",
                                                        choices = sites,
-                                                       selected = unique(df$site)
+                                                       selected = sites
                                     ),
                                     
                                     radioButtons(inputId = "dataset",
@@ -96,15 +105,15 @@ ui <- navbarPage("PERCEBES app",
 
                                    h3("Description"),
 
-                                   helpText("In situ temperature data measured with iButtons. Water/air
+                                   helpText(em("In situ"), "temperature data measured with iButtons. Water/air
                                    temperatures are based on the sensor being underwater/out of
-                                   the water respectively. The names and coordinates of the sites
-                                   can be viewed in the 'Data locations' tab."),
+                                   the water, respectively. Information about the sites can be viewed in the", 
+                                   em("Data locations"), "tab."),
                                    
                                    checkboxGroupInput(inputId = "ibutton_site",
                                                       label = "Select sites",
-                                                      choices = unique(ibutton_df$site),
-                                                      selected = unique(ibutton_df$site)
+                                                      choices = ibutton_sites,
+                                                      selected = ibutton_sites
                                    ),
 
                                    checkboxGroupInput(inputId = "ibutton_temp",
@@ -148,13 +157,15 @@ ui <- navbarPage("PERCEBES app",
                                   
                                   helpText("Tabular data presented in the graphs."),
                                   
-                                  helpText("For the satellite data, the column 'Values' shows the real values at each timestamp.
-                                    The column 'Average' represents the rolling average of multiple days as selected
-                                    for the smoothing window (around the central value)."),
+                                  helpText("For the satellite data, the column,", em("Values"), 
+                                  "shows the real values at each timestamp. The column", em("Average"),
+                                  "represents the rolling average of multiple days as selected
+                                  in the smoothing window (around the central value)."),
                                     
-                                  helpText("For the in situ data, the average value of one or two sensors is presented as a 'Mean'
-                                    value with a standard deviation ('SD'). The 'Average' is calculated the same way as
-                                    the satellite data."),
+                                  helpText("For the", em("in situ"), "data, the average value of one or 
+                                  two sensors is presented as", em("Mean"), "value with a 
+                                  standard deviation (",em("SD"),"). The", em("Average"),
+                                  "is calculated the same way as for the satellite data."),
                                   
                                   radioButtons(inputId = "data",
                                                label = "Select data to display",
@@ -166,12 +177,6 @@ ui <- navbarPage("PERCEBES app",
                                                min = 1,
                                                max = 365,
                                                step = 1),
-                                  
-                                  downloadButton(outputId = "downloadData",
-                                                 label = "Download"),
-                                  
-                                  helpText("Note: the complete dataset is downloaded for the option selected.
-                                           Smoothing window can be selected (values shown in column 'Average')."),
                                   
                                   width = panel_width),
                               
@@ -209,14 +214,8 @@ ui <- navbarPage("PERCEBES app",
 
 server <- function(input, output, session){
 
-    # Data: SST, air temperature, chl-a, upwelling
-
-    # Order sites geographically
-
-    df$site <- as.factor(df$site)
-    df$site <- factor(df$site, levels = sites)
-
-
+    # Satellite data: SST, air temperature, chl-a, upwelling
+    
     rval_df <- reactive({
         df %>%
             arrange(variable, site, date) %>%
@@ -227,8 +226,7 @@ server <- function(input, output, session){
 
 
     # Line plots ==============================================================
-
-
+    
     # Basic plot design:
 
     base_plot <- ggplot() +
@@ -341,6 +339,14 @@ server <- function(input, output, session){
         upw_df <- rval_df() %>% plot_filter("upw")
 
         upw_plot <- base_plot +
+            
+            #Line at 0
+            geom_hline(aes(yintercept = 0), lty = "longdash", color = "grey60") +
+            
+            # Labels
+            annotate("text", x = as.POSIXct("2017-07-01"), y = 0.5, label = "Upwelling") +
+            annotate("text", x = as.POSIXct("2017-07-01"), y = -0.5, label = "Downwelling") +
+                      
             ggtitle("Upwelling index") +
             ylab(expression(paste("UI"))) +
             ylim(-0.5, 0.5)
@@ -519,6 +525,7 @@ server <- function(input, output, session){
     })
     
     
+    
     # Filter data by temperature measure, site, and date
     
     ibutton_filter <- function(df) {
@@ -630,18 +637,6 @@ server <- function(input, output, session){
             table <- ibutton_table()
         }
 
-        
-        # Table downloadable as .csv
-        
-        output$downloadData <- downloadHandler(
-            filename = function() {
-                paste(input$data, ".csv", sep = "")
-            },
-            content = function(file) {
-                write.csv(table, file, row.names = FALSE)
-            }
-        )
-        
 
         # Print table output to screen
         
