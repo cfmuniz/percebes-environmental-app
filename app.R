@@ -224,6 +224,19 @@ server <- function(input, output, session){
     })
 
 
+    # Assign colors to sites:
+    
+    color_palette_7 <- c(c("L0 – Cariño" = "#702234"),
+                         c("L1 – A Coruña" = "#EF476F"),
+                         c("L2 – Camelle" = "#7209B7"),
+                         c("L3 – Bueu" = "#FBAF69"),
+                         c("L4 – Cangas" = "#06D6A0"),
+                         c("L5 – Baiona" = "#118AB2"),
+                         c("L6 – A Guarda" = "#073B4C"))
+    
+    color_palette_3 <- c(c("L1 – A Coruña" = "#7209B7"),
+                         c("L4 – Cangas" = "#06D6A0"),
+                         c("L5 – Baiona" = "#EF476F"))
 
     # Line plots ==============================================================
     
@@ -233,6 +246,7 @@ server <- function(input, output, session){
         scale_x_datetime(date_breaks = "2 month",
                          date_minor_breaks = "1 month",
                          date_labels = "%b %Y") +
+        scale_colour_manual(values = color_palette_7) +
         labs(colour = "Site",
              x = NULL) +
         theme_bw()
@@ -364,6 +378,8 @@ server <- function(input, output, session){
 
     base_density <- ggplot() +
         labs(fill = "Site", col = "Site") +
+        scale_colour_manual(values = color_palette_7) +
+        scale_fill_manual(values = color_palette_7) +
         theme_bw() +
         theme(legend.position = c(1,1),
               legend.justification = c(1,1),
@@ -537,10 +553,13 @@ server <- function(input, output, session){
     }
 
 
+    # Basic plot design:
+    
     ibutton_base_plot <- ggplot() +
         scale_x_datetime(date_breaks = "2 month",
                          date_minor_breaks = "1 month",
                          date_labels = "%b %Y") +
+        scale_color_manual(values = color_palette_3) +
         labs(colour = "Site",
              linetype = "Temperature\nmeasure",
              x = NULL) +
