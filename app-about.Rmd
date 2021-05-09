@@ -57,4 +57,4 @@ References
 
 App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com).
 
-Code available on [GitHub](https://github.com/cfmuniz/percebes-environmental-app")
+Code available on [GitHub](https://github.com/cfmuniz/percebes-environmental-app).
