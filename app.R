@@ -40,7 +40,7 @@ ui <- navbarPage("PERCEBES app",
                                     helpText("SST, air temperature, chlorophyll, and upwelling index data are shown for six
                                     sites along the Galician coast (L1 to L6). For site L0 only SST data is available.
                                     Sites are displayed north to south, more information can be viewed in the", 
-                                    em("Data locations"), "tab.
+                                    em("Map of sites"), "tab.
                                     Data can be visualised as a time series, density plot, or boxplot."),
 
                                     checkboxGroupInput(inputId = "site",
@@ -108,7 +108,7 @@ ui <- navbarPage("PERCEBES app",
                                    helpText(em("In situ"), "temperature data measured with iButtons. Water/air
                                    temperatures are based on the sensor being underwater/out of
                                    the water, respectively. Information about the sites can be viewed in the", 
-                                   em("Data locations"), "tab."),
+                                   em("Map of sites"), "tab."),
                                    
                                    checkboxGroupInput(inputId = "ibutton_site",
                                                       label = "Select sites",
@@ -184,7 +184,7 @@ ui <- navbarPage("PERCEBES app",
                                   dataTableOutput("dfTable")
                               ))),
                  
-                 tabPanel("Data locations",
+                 tabPanel("Map of sites",
                           
                           div(class="outer",
                               
