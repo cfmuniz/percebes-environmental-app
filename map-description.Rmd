@@ -7,9 +7,9 @@ output: html_document
 
 ### Description
 
-Map of the areas used to measure each variable in the app.
+Areas over which each variable was measured:
 
-- <b>Blue polygons</b>: SST (for SST and upwelling index, see <i>About</i> for details)
-- <b>Red polygons</b>: AT (air temperature, both at ground level and at 2m height)
-- <b>Black polygons</b>: chlorophyll
-- <b>Bubble markers</b>: location where samples of percebes were collected
+- <b>Blue rectangles</b>: SST (same for SST and upwelling index, see *About* for details)
+- <b>Red rectangles</b>: AT (air temperature, same at ground level and at 2m height)
+- <b>Black rectangles</b>: chlorophyll-a
+- <b>Bubble markers</b>: *percebes* sampling points (data not disclosed)
