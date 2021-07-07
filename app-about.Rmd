@@ -7,15 +7,13 @@ output: html_document
 
 ### About
 
-Remote sensing data of sea surface temperature (SST), air temperature, chlorophyll, and upwelling index data are available for 6 sites along the Galician coast (Spain).
+Remote sensing and *in situ* measurements of some environmental variables can be displayed for seven sites in the NW coast of Spain (Galicia). Sites are labelled from north to south as L0 to L6 (see the *Map* for more details).
 
-Data can be visualised as a time series, which allows to select daily values and/or smoothed values over an averaged time window. The number of days to calculate the smoothing window can be selected by the user.
+Remote sensing variables include sea surface temperature (SST), air temperature (at 2m and at ground level), chlorophyll-a, and an upwelling index. Data can be visualised as a time series, which allows to select daily values and/or smoothed values averaged over a time window. The number of days to calculate the smoothing window can be selected by the user. These data can be plotted as a time series or as a density plot during a time period which can be chosen by the user, or as a boxplot (which uses the entire period available by default).
 
-A date range can only be selected to visualise data as a time series or density plot.
+In addition, <i>in situ</i> measures of water and air temperature data are available for three of the sites (L1, L4, and L5).
 
-In addition, <i>in situ</i> measures of water and air temperature data are available for three of the sites.
-
-Data were processed within the framework of project [PERCEBES](https://www.unioviedo.es/percebes/)
+Data were processed within the framework of project [PERCEBES](https://www.unioviedo.es/percebes/).
 
 <p>&nbsp;</p>
 
@@ -24,24 +22,21 @@ Data were processed within the framework of project [PERCEBES](https://www.uniov
 - Sea surface temperature (SST) data were obtained from the OSTIA model of the UK Met Office:
 [https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html](https://coastwatch.pfeg.noaa.gov/erddap/griddap/jplUKMO_OSTIAv20.html)
 
-- Air temperature data (at 2m) were obtained from the ERA5-Land dataset from Copernicus:
-[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form)
+- Air temperature data at 2m, and at ground level (skin temperature, SKT) were obtained from the ERA5-Land dataset from Copernicus:
+[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land)
 
-- Skin temperature (SKT, ground level) data were obtained from the ERA5-Land dataset from Copernicus:
-[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form)
-
-- Chlorophyll data were obtained from Ifremer's primary productivity model:
+- Chlorophyll-a data were obtained from Ifremer's primary productivity model:
 [http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html](http://tds1.ifremer.fr/thredds/dodsC/MARC-IBI-OC5_L4-OBS_FULL_TIME_SERIE.html)
 
-- A thermal upwelling index was calculated as the difference in SST between the coast and a point 350km offshore following Pfaff et al. (2011), using SST data from the OSTIA model. Thermal upwelling indices were calculated using the following formula:
+- A thermal upwelling index was calculated as the difference in SST between the coast and a point 350km offshore following Pfaff et al. (2011), using the SST data from the OSTIA model. Thermal upwelling indices were calculated using the following formula:
 
     UPW = (SST<sub>offhore</sub> - SST<sub>onshore</sub>) / (SST<sub>offshore</sub> - T<sub>bottom</sub>)
 
     where, <i>SST<sub>offshore</sub></i> represents SST 350km offshore, <i>SST<sub>onshore</sub></i> represents SST close to the coast, and <i>T<sub>bottom</sub></i> is a constant temperature defined as 8ºC, representative of the bottom Eastern North Atlantic Central Water mass affecting the area of study (Ríos et al. 1992).
 
-- <i>In situ</i> data of air and water temperature were collected within the framework of project PERCEBES using iButtons (one or two depending on the site and period).
+- <i>In situ</i> data of air and water temperature were collected within the framework of project PERCEBES using temperature loggers (*Maxim iButton®*, one or two depending on the site and period).
 
-SST, air temperature, chl-a, and upwelling index data were processed and provided by Nicolas Weidberg. <i>In situ</i> air and water temperature data were processed and provided by Alba Aguión.
+Size of the areas used to measure each variable can be seen in the *Map*. SST, air temperature, chlorophyll-a, and upwelling index data were processed and provided by Nicolas Weidberg. <i>In situ</i> air and water temperature data were processed and provided by Alba Aguión.
 
 <p>&nbsp;</p>
 
@@ -55,6 +50,6 @@ References
 
 #### Contact
 
-App developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com).
+App was developed by Carlota Fernández Muñiz (carlota.fernandezmuniz [at] gmail.com).
 
-Code available on [GitHub](https://github.com/cfmuniz/percebes-environmental-app).
+Code is available on [GitHub](https://github.com/cfmuniz/percebes-environmental-app).
