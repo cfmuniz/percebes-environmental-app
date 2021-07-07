@@ -286,8 +286,7 @@ server <- function(input, output, session){
 
         sst_plot <- base_plot +
             ggtitle("SST") +
-            ylab("SST (ºC)") +
-            ylim(11.5, 20.4)
+            ylab("SST (ºC)")
 
         plot_select_data(sst_plot, sst_df)
 
@@ -303,8 +302,7 @@ server <- function(input, output, session){
 
         airtemp_plot <- base_plot +
             ggtitle("Air temperature at 2m") +
-            ylab("Air temperature (ºC)") +
-            ylim(3.5, 33.5)
+            ylab("Air temperature (ºC)")
 
         plot_select_data(airtemp_plot, airtemp_df)
 
@@ -320,8 +318,7 @@ server <- function(input, output, session){
         
         skt_plot <- base_plot +
             ggtitle("Air temperature (ground level)") +
-            ylab("SKT (ºC)") +
-            ylim(2.5, 45)
+            ylab("SKT (ºC)")
         
         plot_select_data(skt_plot, skt_df)
         
@@ -337,8 +334,7 @@ server <- function(input, output, session){
 
         chl_plot <- base_plot +
             ggtitle("Chlorophyll") +
-            ylab(expression(paste("Chlorophyll (microgram L" ^ -1, ")"))) +
-            ylim(0, 30)
+            ylab(expression(paste("Chlorophyll (microgram L" ^ -1, ")")))
 
         plot_select_data(chl_plot, chl_df)
 
@@ -358,12 +354,11 @@ server <- function(input, output, session){
             geom_hline(aes(yintercept = 0), lty = "longdash", color = "grey60") +
             
             # Labels
-            annotate("text", x = as.POSIXct("2017-07-01"), y = 0.5, label = "Upwelling") +
-            annotate("text", x = as.POSIXct("2017-07-01"), y = -0.5, label = "Downwelling") +
+            annotate("text", x = as.POSIXct(input$dates[1]), y = 0.5, label = "Upwelling") +
+            annotate("text", x = as.POSIXct(input$dates[1]), y = -0.5, label = "Downwelling") +
                       
             ggtitle("Upwelling index") +
-            ylab(expression(paste("UI"))) +
-            ylim(-0.5, 0.5)
+            ylab(expression(paste("UI")))
 
         plot_select_data(upw_plot, upw_df)
 
